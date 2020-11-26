@@ -39,19 +39,22 @@ public:
   auto &gsNjClient() { return njClient; }
   auto &gsStopConnectionThread() { return stopConnectionThread; }
   auto &gsMtx() { return mtx; }
+  auto &gsUpdateChannelInfo() { return updateChannelInfo; }
   bool connected = false;
+  bool voiceChatMode = false;
   void clearBuffers(float **buf, int nch, int len);
   void adjustVolume();
   void setBpm(int bpm);
   std::vector<RemoteUser> getRemoteUsers();
   void setUserChannelVolume(int userId, int channelId, float volume);
   void setLocalChannelVolume(int channelId, float volume);
+  void setVoiceChat(bool toggle);
   void sendChatMessage(std::string message);
 
 private:
   std::thread *connectionThread;
   NJClient *njClient = new NJClient;
-  bool stopConnectionThread, autoRemoteVolume;
+  bool stopConnectionThread, autoRemoteVolume, updateChannelInfo;
   std::mutex mtx;
 };
 

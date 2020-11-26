@@ -47,6 +47,7 @@ NinjamClient::NinjamClient() {
                                       false, false);
   connectionThread = nullptr;
   stopConnectionThread = true;
+  updateChannelInfo = true;
 }
 
 NinjamClient::~NinjamClient() {
@@ -107,6 +108,19 @@ void keepConnectionThread(NinjamClient *ninjamClient) {
           L_(ldebug) << "num users: " << g_client->GetNumUsers() << endl;
         }
         connected = true;
+      }
+
+      if (ninjamClient->gsUpdateChannelInfo() == true) {
+        int flg = 0;
+        g_client->GetLocalChannelInfo(0, NULL, NULL, NULL, NULL, &flg);
+        // unset voice chat (2) and session mode (4) flags
+        flg &= ~(2|4);
+        if (ninjamClient->voiceChatMode) {
+          flg |= 2;
+        }
+        g_client->SetLocalChannelInfo(0, "channel0", true, 0, false, 0, true, true, false, 0, true, flg);
+        g_client->NotifyServerOfChannelChange();
+        ninjamClient->gsUpdateChannelInfo() = false;
       }
     }
   }
@@ -331,6 +345,17 @@ void NinjamClient::setLocalChannelVolume(int channelId, float volume) {
       njClient->SetLocalChannelMonitoring(channelId, true, volume, false, 0.0f,
                                           false, false, false, false);
     }
+  }
+}
+
+// channels in voice chat mode transmit audio without the interval delay
+void NinjamClient::setVoiceChat(bool toggle) {
+  L_(ltrace) << "[NinjamClient] Entering NinjamClient::setVoiceChat";
+  L_(ltrace) << "[NinjamClient] toggle: " << toggle;
+  if (toggle != voiceChatMode) {
+    // the update should happen in the connection thread
+    voiceChatMode = toggle;
+    updateChannelInfo = true;
   }
 }
 

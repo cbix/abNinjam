@@ -11,7 +11,8 @@ enum {
   INPUT_RIGHT = 3,
   CONNECT = 4,
   METRONOME_VOLUME = 5,
-  MONITOR_VOLUME = 6
+  MONITOR_VOLUME = 6,
+  VOICE_CHAT = 7
 };
 
 }

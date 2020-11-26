@@ -18,7 +18,7 @@ public:
   NinjamClient *ninjamClient;
   NinjamClientStatus ninjamClientStatus = disconnected;
   ConnectionProperties *connectionProperties;
-  float *connect, *metronomeVolume, *monitorVolume;
+  float *connect, *metronomeVolume, *monitorVolume, *voiceChat;
   float *output_buffers[2], *input_buffers[2];
   double sampleRate;
   AbNinjamPlugin() {
@@ -51,6 +51,9 @@ static void connectPort(LV2_Handle instance, uint32_t port, void *data) {
   case MONITOR_VOLUME:
     plugin->monitorVolume = static_cast<float *>(data);
     break;
+  case VOICE_CHAT:
+    plugin->voiceChat = static_cast<float *>(data);
+    break;
   case INPUT_LEFT:
     plugin->input_buffers[0] = static_cast<float *>(data);
     break;
@@ -77,6 +80,8 @@ static void run(LV2_Handle instance, uint32_t sample_count) {
 
     plugin_data->ninjamClient->setLocalChannelVolume(
         0, *plugin_data->monitorVolume);
+
+    plugin_data->ninjamClient->setVoiceChat(*plugin_data->voiceChat > 0.f);
 
     if (plugin_data->ninjamClientStatus != ok) {
       plugin_data->ninjamClientStatus =
