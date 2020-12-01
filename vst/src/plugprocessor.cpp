@@ -213,6 +213,14 @@ tresult PLUGIN_API PlugProcessor::process(Vst::ProcessData &data) {
             connectToServer(connectParam, &connectionProperties);
           }
           break;
+        case AbNinjamParams::kParamVoiceId:
+          L_(ltrace) << "AbNinjamParams::kParamVoiceId has changed";
+          if (paramQueue->getPoint(numPoints - 1, sampleOffset, value) ==
+              kResultTrue) {
+            voiceParam = value > 0 ? 1 : 0;
+            // set voice chat flag
+          }
+          break;
         case AbNinjamParams::kBypassId:
           if (paramQueue->getPoint(numPoints - 1, sampleOffset, value) ==
               kResultTrue)
@@ -463,6 +471,10 @@ tresult PLUGIN_API PlugProcessor::setState(IBStream *state) {
   if (streamer.readInt32(savedConnectParam) == false)
     return kResultFalse;
 
+  int32 savedVoiceParam = 0;
+  if (streamer.readInt32(savedVoiceParam) == false)
+    return kResultFalse;
+
   int32 savedConnectionIndicatorParam = 0;
   if (streamer.readInt32(savedConnectionIndicatorParam) == false)
     return kResultFalse;
@@ -471,6 +483,7 @@ tresult PLUGIN_API PlugProcessor::setState(IBStream *state) {
   monitorVolumeParam = savedMonitorVolumeParam;
   mBypass = savedBypass > 0;
   connectParam = savedConnectParam > 0 ? 1 : 0;
+  voiceParam = savedVoiceParam > 0 ? 1 : 0;
   connectionIndicatorParam = savedConnectionIndicatorParam > 0 ? 1 : 0;
 
   return kResultOk;
@@ -485,6 +498,7 @@ tresult PLUGIN_API PlugProcessor::getState(IBStream *state) {
   double toSaveMonitorVolumeParam = monitorVolumeParam;
   int32 toSaveBypass = mBypass ? 1 : 0;
   int32 toSaveConnectParam = connectParam;
+  int32 toSaveVoiceParam = voiceParam;
   int32 toSaveConnectionIndicatorParam = connectionIndicatorParam;
 
   IBStreamer streamer(state, kLittleEndian);
@@ -492,6 +506,7 @@ tresult PLUGIN_API PlugProcessor::getState(IBStream *state) {
   streamer.writeDouble(toSaveMonitorVolumeParam);
   streamer.writeInt32(toSaveBypass);
   streamer.writeInt32(toSaveConnectParam);
+  streamer.writeInt32(toSaveVoiceParam);
   streamer.writeInt32(toSaveConnectionIndicatorParam);
 
   return kResultOk;
@@ -613,6 +628,12 @@ void PlugProcessor::connectToServer(
                                        ninjamClientStatus);
       sendMessage(message);
     }
+  }
+}
+
+void PlugProcessor::setVoiceChatMode(int16 toggle) {
+  if (ninjamClient) {
+    ninjamClient->setVoiceChat(toggle > 0);
   }
 }
 

@@ -34,6 +34,10 @@ tresult PLUGIN_API PlugController::initialize(FUnknown *context) {
         STR16("Connection indicator"), STR16("Connected/Disconnected"), 1, 0,
         ParameterInfo::kIsReadOnly, AbNinjamParams::kParamConnectionIndicatorId,
         0, STR16("Connection"));
+    parameters.addParameter(STR16("Voice Chat Mode"), nullptr, 1, 0,
+                            ParameterInfo::kCanAutomate,
+                            AbNinjamParams::kParamVoiceId, 0,
+                            STR16("VoiceChat"));
 
     notificationLabel = nullptr;
     mixerScrollView = nullptr;
@@ -161,6 +165,11 @@ tresult PLUGIN_API PlugController::setComponentState(IBStream *state) {
   if (streamer.readInt8(connectState) == false)
     return kResultFalse;
   setParamNormalized(AbNinjamParams::kParamConnectId, connectState);
+
+  int8 voiceChatState = 0;
+  if (streamer.readInt8(voiceChatState) == false)
+    return kResultFalse;
+  setParamNormalized(AbNinjamParams::kParamVoiceId, voiceChatState);
 
   int8 connectionIndicatorState = 0;
   if (streamer.readInt8(connectionIndicatorState) == false)

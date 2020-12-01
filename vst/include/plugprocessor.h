@@ -50,6 +50,7 @@ public:
 
 protected:
   int16 connectParam = 0;
+  int16 voiceParam = 0;
   int16 connectionIndicatorParam = 0;
   Vst::ParamValue metronomeVolumeParam = 0.5;
   Vst::ParamValue monitorVolumeParam = 1;
@@ -57,6 +58,7 @@ protected:
 
 private:
   void connectToServer(int16 value, ConnectionProperties *connectionProperties);
+  void setVoiceChatMode(int16 toggle);
   char *tCharToCharPtr(Steinberg::Vst::TChar *tChar);
   void sendNotification(std::string text);
   void sendChatMessageUpdate(std::string text);
