@@ -219,6 +219,7 @@ tresult PLUGIN_API PlugProcessor::process(Vst::ProcessData &data) {
               kResultTrue) {
             voiceParam = value > 0 ? 1 : 0;
             // set voice chat flag
+            setVoiceChatMode(voiceParam);
           }
           break;
         case AbNinjamParams::kBypassId:
