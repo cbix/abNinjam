@@ -1,8 +1,28 @@
+@prefix abnj: <@LV2PLUGIN_URI@> .
+@prefix atom: <http://lv2plug.in/ns/ext/atom#> .
 @prefix lv2:  <http://lv2plug.in/ns/lv2core#>.
+@prefix param: <http://lv2plug.in/ns/ext/parameters#> .
+@prefix patch: <http://lv2plug.in/ns/ext/patch#> .
+@prefix state: <http://lv2plug.in/ns/ext/state#> .
 @prefix doap: <http://usefulinc.com/ns/doap#>.
 @prefix pprops: <http://lv2plug.in/ns/ext/port-props#>.
 @prefix foaf: <http://xmlns.com/foaf/0.1/>.
-@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+abnj:host
+  a lv2:Parameter ;
+  rdfs:label "Host" ;
+  rdfs:range atom:String .
+
+abnj:user
+  a lv2:Parameter ;
+  rdfs:label "Username" ;
+  rdfs:range atom:String .
+
+abnj:pass
+  a lv2:Parameter ;
+  rdfs:label "Password" ;
+  rdfs:range atom:String .
 
 <@LV2PLUGIN_URI@>
   a doap:Project, lv2:Plugin, lv2:UtilityPlugin ;
@@ -85,4 +105,25 @@
                 lv2:maximum 1;
                 lv2:default 1;
                 lv2:portProperty pprops:hasStrictBounds;
-        ].
+        ],
+        [
+          a lv2:InputPort, atom:AtomPort;
+          atom:bufferType atom:Sequence, atom:Sequence;
+          atom:supports patch:Message;
+          lv2:designation lv2:control;
+          lv2:index 7;
+          lv2:symbol "events_in";
+          lv2:name "Events input";
+        ],
+        [
+          a lv2:OutputPort, atom:AtomPort;
+          atom:bufferType atom:Sequence;
+          atom:supports patch:Message, atom:Sequence;
+          lv2:designation lv2:control;
+          lv2:index 8;
+          lv2:symbol "events_out";
+          lv2:name "Events output";
+        ];
+        patch:writable abnj:host,
+          abnj:user,
+          abnj:pass.
